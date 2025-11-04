@@ -27,11 +27,13 @@ async def get_item_price_avg(db: Session = Depends(get_db)) -> dict[str, float]:
     avg = round(sum(result) / len(result), 2)
     return {"price_avg": avg}
 
+
 @router.get("/names")
 async def get_item_names(db: Session = Depends(get_db)) -> list[str]:
     result = db.execute(select(ItemDB.name)).scalars().all()
 
     return result
+
 
 @router.post("/", response_model=ItemPost)
 async def create_item(item: Item, db: Session = Depends(get_db)):
@@ -56,27 +58,33 @@ async def get_item(item_id: int, db: Session = Depends(get_db)):
 
     return item
 
+
 @router.get("/max_price/{max_price}", response_model=List[ItemGet])
 async def get_items_by_max_price(max_price: float, db: Session = Depends(get_db)):
     items = db.execute(select(ItemDB).where(ItemDB.price <= max_price)).scalars().all()
 
     if len(items) == 0:
-        raise HTTPException(status_code=404, detail=f"No item found with max price '{max_price}'")
+        raise HTTPException(
+            status_code=404, detail=f"No item found with max price '{max_price}'"
+        )
 
     return items
+
 
 @router.get("/min_price/{min_price}", response_model=List[ItemGet])
 async def get_item_by_min_price(min_price: float, db: Session = Depends(get_db)):
     items = db.execute(select(ItemDB).where(ItemDB.price >= min_price)).scalars().all()
 
     if len(items) == 0:
-        raise HTTPException(status_code=404, detail=f"No item found with min price '{min_price}'")
+        raise HTTPException(
+            status_code=404, detail=f"No item found with min price '{min_price}'"
+        )
 
     return items
 
+
 @router.get("/show_owner/{item_id}", response_model=List[User])
 async def show_item_owner(item_id: int, db: Session = Depends(get_db)):
-
     item = db.query(ItemDB).filter(ItemDB.id == item_id).first()
 
     if item is None:
@@ -88,6 +96,7 @@ async def show_item_owner(item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Owners not found")
 
     return owners
+
 
 @router.put("/{item_id}", response_model=ItemUpdate)
 async def update_item(
@@ -121,4 +130,3 @@ async def delete_item(item_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": f"Item '{item_name}' deleted successfully"}
-
