@@ -21,6 +21,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(length=25), nullable=False, unique=True)
     email = Column(String(length=50), nullable=False, unique=True)
+    password_hash = Column(String(length=255), nullable=False)
 
     items_bought = relationship("Item", secondary="user_items", back_populates="buyers")
 
